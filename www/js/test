@@ -1,0 +1,16 @@
+curl 'https://psl.vmaxlive.net/rest/dvrStream/startStream'
+    -H 'Accept: */*'
+    -H 'Origin: file://'
+    -H 'User-Agent: Mozilla/5.0 (Linux; Android 4.4.2; SM-N900W8 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Mobile Crosswalk/13.42.319.12 Mobile Safari/537.36'
+    -H 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8' --data 'dvrId=8' --compressed
+
+
+curl 'https://psl.vmaxlive.net/rest/dvrStream/startStream'
+    -H 'Accept: application/json, text/plain, */*'
+    -H 'Origin: file://'
+    -H 'User-Agent: Mozilla/5.0 (Linux; Android 4.4.2; SM-N900W8 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Mobile Crosswalk/13.42.319.12 Mobile Safari/537.36'
+    -H 'Content-Type: application/x-www-form-urlencoded' --data '{"dvrId":8}' --compressed
+
+
+curl 'https://psl.vmaxlive.net/rest/dvrStream/startStream' -H 'Accept: application/json, text/plain, */*' -H 'Origin: file://' -H 'User-Agent: Mozilla/5.0 (Linux; Android 4.4.2; SM-N900W8 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Mobile Crosswalk/13.42.319.12 Mobile Safari/537.36' -H 'Content-Type: application/json;charset=UTF-8'
+--data-binary '{"dvrId":8}' --compressed
