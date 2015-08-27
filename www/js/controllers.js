@@ -1,17 +1,29 @@
 angular.module('starter.controllers', [])
-
-    .controller('BusFootageCtrl', function ($scope, $stateParams, $timeout, $ionicPlatform, StreamService) {
+    .controller('BusFootageCtrl', function ($scope, $stateParams, $timeout, $ionicPlatform, $ionicLoading, StreamService, SocketService, serviceUrl) {
         var streamId;
         $scope.isConnected = false;
+        $scope.hasControls = false;
         var videoTimeout;
-        var dvrId = $stateParams.dvrId || 8;
+        var dvrId = $stateParams.dvrId;
+        var videoTag = $('#myVideo');
+        var html5Stream;
+        var retry = 3;
 
         $scope.getStream = function(){
+            $ionicLoading.show({
+                template: '<ion-spinner></ion-spinner>'
+            });
+
             StreamService.getStream(dvrId, function (data) {
+
                 console.log(data);
                 console.log(data.html5StreamUrl);
 
-                if(data.error) return;
+                if(data.error) {
+                    $ionicLoading.hide();
+                    return;
+                }
+
 
                 $timeout(function(){
                     $scope.isConnected = true;
@@ -19,37 +31,85 @@ angular.module('starter.controllers', [])
 
                 streamId = data.streamId;
                 videoTimeout = $timeout(function(){
-                    $('#myVideo').attr('src',data.html5StreamUrl);
-                }, 60000);
+                    html5Stream =data.html5StreamUrl;
+                    $scope.channels = data.channels;
+                    videoTag.on('stalled', function(){
+                        streamingError('stalled');
+                    });
+                    videoTag.on('error', function(){
+                        streamingError('error');
+                    });
+                    loadStream();
+                }, 10000);
+
+                $timeout(function(){
+                    $ionicLoading.hide();
+                }, 10000);
+
+                SocketService.emit('registerStream', streamId, serviceUrl +
+                    "dvrStream/disconnectStream?fleetId=psl&streamId=", streamId,
+                    function(response) {
+                        console.log('register response', response);
+                        $scope.hasControls = 'controls' === response;
+                    });
 
             },function (xhr, type) {
+                $ionicLoading.hide();
                 alert('Ajax error! ' + type);
             });
         };
 
+        function streamingError(msg) {
+            videoTag.removeAttr('src');
+            console.log(msg, 'retry...');
+            $timeout(loadStream, 15000);
+            retry --;
+        }
+
+        function loadStream() {
+            videoTag.attr('src', html5Stream);
+            if(!retry) {
+                videoTag.off('stalled');
+            }
+        }
+
         $scope.disconectStream = function(){
+            $ionicLoading.hide();
             if($scope.isConnected) {
-                $timeout.cancel(videoTimeout);
-                StreamService.disconnectStream(streamId,
-                    function (data) {
-                        console.log(data);
-                        $timeout(function(){
-                            $scope.isConnected = false;
-                        }, 100);
-                        $('#myVideo').removeAttr('src');
-                    },
-                    function (xhr, type) {
-                        alert('Ajax error! ' + type);
-                    }
-                );
+                SocketService.emit('disconnectStream', streamId);
+                console.log('disconnect stream called!');
+                $scope.isConnected = false;
+                videoTag.off('stalled');
             }
         };
+
+        $scope.requestControl = function(){
+          SocketService.emit('requestControls', streamId, 'mobile', function(response) {
+              if(response) {
+                  $scope.hasControls = true;
+              } else {
+                  alert("Fail to request controls.");
+              }
+          });
+        };
+
+        SocketService.on('disconnectStream', function(data) {
+            console.log('receive disconnect', data);
+            if (dvrId) {
+
+            }
+        });
+
+        SocketService.on('giveControls', function(requester) {
+            console.log('The user ' + requester +' requested the control');
+            $scope.hasControls = false;
+        });
 
         StreamService.freeStream($scope);
 
         $timeout(function(){
             $scope.getStream();
-        }, 5000);
+        }, 100);
 
 
 

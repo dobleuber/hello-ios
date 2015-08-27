@@ -1,15 +1,31 @@
 <ion-view view-title="Dashboard">
-  <ion-content class="padding">
-    <div class="card">
-      <video id="myVideo" width="400" controls autoplay>
-        Your browser does not support HTML5 video.
-      </video>
-    </div>
-    <div class="row">
+    <ion-content class="padding">
+        <div class="card">
+            <video id="myVideo" width="400" controls autoplay>
+                Your browser does not support HTML5 video.
+            </video>
+        </div>
+        <div class="button-bar">
 
-        <button class="button button-positive" ng-click="getStream()" ng-disabled="isConnected">Connect</button>
-        <button class="button button-balanced" ng-click="disconectStream()" ng-disabled="!isConnected">Disconnect</button>
+            <button class="button button-positive" ng-click="getStream()" ng-disabled="isConnected">Connect</button>
+            <button class="button button-balanced" ng-click="disconectStream()" ng-disabled="!isConnected">Disconnect
+            </button>
 
-    </div>
-  </ion-content>
+        </div>
+        <ion-item ng-repeat="channel in channels" type="item-text-wrap" ng-click="changeChannel(channel.number)" ng-show="hasControls">
+            <img ng-src="{{chat.face}}">
+
+            <h2>{{channel.name}}</h2>
+
+            <div class="button-bar">
+                <i class="button button-icon icon ion-ios-videocam" ng-show="channel.videoAvailable"></i>
+                <i class="button button-icon icon ion-ios-videocam-outline" ng-hide="channel.videoAvailable"></i>
+                <i class="button button-icon icon ion-volume-medium" ng-show="channel.audioAvailable"></i>
+                <i class="button button-icon icon ion-volume-mute" ng-hide="channel.audioAvailable"></i>
+            </div>
+        </ion-item>
+        <div class="button-bar" ng-show="isConnected && !hasControls">
+            <button class="button button-alert" ng-click="requestControl()">Request control</button>
+        </div>
+    </ion-content>
 </ion-view>

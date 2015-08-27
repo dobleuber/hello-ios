@@ -5,7 +5,7 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', 'starter.filters'])
+angular.module('starter', ['ionic', 'btford.socket-io', 'starter.controllers', 'starter.services', 'starter.filters'])
 
     .run(function ($ionicPlatform) {
         $ionicPlatform.ready(function () {
@@ -39,16 +39,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
             })
 
             // Each tab has its own nav history stack:
-
-            .state('tab.dash', {
-                url: '/dash',
-                views: {
-                    'tab-dash': {
-                        templateUrl: 'templates/tab-dash.html',
-                        controller: 'BusFootageCtrl'
-                    }
-                }
-            })
 
             .state('tab.chats', {
                 url: '/chats',
@@ -90,7 +80,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
             });
 
         // if none of the above states are matched, use this as the fallback
-        $urlRouterProvider.otherwise('/tab/dash');
+        $urlRouterProvider.otherwise('/tab/chats');
 
     })
-    .constant('serviceUrl', 'https://psl.vmaxlive.net/rest/');
+    .constant('serviceUrl', 'https://psl.vmaxlive.net/rest/')
+    .constant('socketUrl', 'https://psl.vmaxlive.net:9090');

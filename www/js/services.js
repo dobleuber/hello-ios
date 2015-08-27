@@ -86,6 +86,10 @@ angular.module('starter.services', [])
                 scope.disconectStream();
             });
 
+            $ionicPlatform.on('resign', function(){
+                scope.disconectStream();
+            });
+
             var deregisterBack = $ionicPlatform.registerBackButtonAction(function(){
                 scope.disconectStream();
             }, 501);
@@ -108,4 +112,14 @@ angular.module('starter.services', [])
         return {
             all: all
         };
+    })
+
+    .factory('SocketService', function(socketFactory, socketUrl){
+        var myIoSocket = io.connect(socketUrl);
+
+        var mySocket = socketFactory({
+            ioSocket: myIoSocket
+        });
+
+        return mySocket;
     });
